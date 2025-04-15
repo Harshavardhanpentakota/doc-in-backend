@@ -4,15 +4,15 @@ const postRouter=express.Router();
 
 const createPost = async (req, res) => {
   try {
-    const { id, author, title, content, fileAttachments } = req.body;
+    const { id, author, title, content, fileAttachments, answerableByEveryone, tags } = req.body;
     const files = fileAttachments.map((file) => file.url)
     // Create a new post
-    const newPost = new PostModel({ author ,id, title, content, files  });
+    const newPost = new PostModel({ id:id, author:author , answerableByEveryone: answerableByEveryone, title: title, content:content, fileAttachments: fileAttachments, tags: tags });
     await newPost.save();
 
     // Find the user and update their posts array
     const user = await UserModel.findOneAndUpdate(
-      { id },
+      { userId: author.userId },
       { $push: { posts: newPost._id } },
       { new: true, upsert: true }
     );
